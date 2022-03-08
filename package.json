@@ -1,0 +1,32 @@
+{
+    "private": true,
+    "scripts": {
+        "format": "prettier --write \"**/*.{json,js,yaml,yml,md}\"",
+        "makefile": "node ./.scripts/makefile",
+        "readme": "node ./.scripts/readme",
+        "convert": "node ./.scripts/handwriting",
+        "test": "node ./.scripts/test",
+        "build": "node ./.scripts/build",
+        "docker:build": "./.scripts/build_docker.sh",
+        "docker": "./.scripts/run_docker.sh"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/JacobLinCool/NTNU-CSIE-CP2.git"
+    },
+    "author": "JacobLinCool <jacoblincool@gmail.com> (https://github.com/JacobLinCool)",
+    "license": "Unlicensed",
+    "bugs": {
+        "url": "https://github.com/JacobLinCool/NTNU-CSIE-CP2/issues"
+    },
+    "homepage": "https://github.com/JacobLinCool/NTNU-CSIE-CP2#readme",
+    "devDependencies": {
+        "doxygen": "^0.4.0",
+        "js-yaml": "^4.1.0",
+        "md-to-pdf": "^5.1.0",
+        "prettier": "^2.5.1"
+    },
+    "dependencies": {
+        "ora": "5.4.1"
+    }
+}

@@ -1,3 +1,7 @@
+*
+!*/
+!*.*
+
 # Prerequisites
 *.d
 
@@ -50,3 +54,11 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+**/.DS_Store
+node_modules/
+*.log
+*.pdf
+*.zip
+source/**/README.md
+# source/**/*.zip
