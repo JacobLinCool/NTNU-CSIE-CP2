@@ -30,7 +30,7 @@ function generate_makefile(dir) {
         all += `\tgcc ${filename}.c -lm -o ${filename}\n`;
         clean += `\trm -f ${filename}\n`;
     }
-    return `all: \n${all}\nclean: \n${clean}\trm -f ${path.basename(dir)}.zip\n\nzip: \n\tzip ${path.basename(
+    return `all: \n${all}\nclean: \n${clean}\trm -f ${path.basename(dir)}.zip\n\nzip: \n\tzip -r ${path.basename(
         dir
-    )} *.c *.h **/*.h *.pdf Makefile\n`;
+    )} *.c *.h *.pdf Makefile lib\n`;
 }
