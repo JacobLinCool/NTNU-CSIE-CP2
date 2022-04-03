@@ -1,5 +1,7 @@
 tasks:
     - init: |
-          echo 'TODO: build project'
+          pnpm install
       command: |
-          echo 'TODO: start app'
+          clear &&
+          echo "Welcome, they are my computer programming II homeworks." &&
+          echo "I am Jacob Lin, a student at NTNU in Taiwan."
