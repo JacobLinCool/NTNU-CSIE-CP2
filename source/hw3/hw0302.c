@@ -128,7 +128,7 @@ i32 main() {
     printf("Open a srt file: ");
     scanf("%[^\n]%*c", filepath);
     printf("Speed (0.5-2): ");
-    scanf("%lf", &speed);
+    THROW_IF(scanf("%lf", &speed) != 1, "Invalid Speed");
 
     THROW_IF(speed < 0.5 || speed > 2, "Speed must be in range of 0.5 ~ 2. Received %lg", speed);
 

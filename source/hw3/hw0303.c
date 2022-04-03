@@ -33,5 +33,7 @@ i32 main() {
     }
 
     THROW_IF(write_bmp(bmp, output, 24) != 0, "Failed to write the output image: \"%s\"\n", output);
+    printf("Done.\n");
+
     return EXIT_SUCCESS;
 }
