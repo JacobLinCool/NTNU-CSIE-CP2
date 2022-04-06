@@ -1,6 +1,6 @@
 // #define DEBUG
 #include "helper.h"
-#include "bmp.h"
+#include "lib/bmp.h"
 
 i32 main() {
     string input = calloc(1024, sizeof(char));
@@ -16,24 +16,22 @@ i32 main() {
     printf("Please enter the radius: ");
     THROW_IF(scanf("%" SCNd32, &radius) != 1, "Invalid radius.");
 
-    BMP* bmp = read_bmp(input);
-    THROW_IF(bmp == NULL, "Failed to load the input image: \"%s\"\n", input);
-    THROW_IF(strncmp(bmp->header->magic, "BM", 2) != 0, "\"%s\" is not a valid BMP file. Magic: %s\n", input, bmp->header->magic);
+    BMP* bmp;
+    u8 error = read_bmp(input, &bmp);
+    THROW_IF(error, "Failed to load the input image: \"%s\"\n", BMP_ERROR_MESSAGE[error]);
 
-    f64 r_square = pow(radius, 2);
+    f64 r_square = radius * radius;
 
-    for (i32 y = 0; y < bmp->header->height; y++) {
-        for (i32 x = 0; x < bmp->header->width; x++) {
+    for (i32 y = 0; y < bmp->header->info_header.height; y++) {
+        for (i32 x = 0; x < bmp->header->info_header.width; x++) {
             if (pow(x - center_x, 2) + pow(y - center_y, 2) > r_square) {
-                bmp->pixels[y][x]->red = 0xFF;
-                bmp->pixels[y][x]->green = 0xFF;
-                bmp->pixels[y][x]->blue = 0xFF;
+                bmp->rect(bmp, x, y, 1, 1, PIXEL_WHITE);
             }
         }
     }
 
-    THROW_IF(write_bmp(bmp, output, 24) != 0, "Failed to write the output image: \"%s\"\n", output);
-    printf("Done.\n");
+    THROW_IF(bmp->save(bmp, output, 8, 8, 8, 0), "Failed to write the output image: \"%s\"\n", output);
 
+    printf("Done.\n");
     return EXIT_SUCCESS;
 }

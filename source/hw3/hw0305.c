@@ -1,6 +1,6 @@
 // #define DEBUG
 #include "helper.h"
-#include "bmp.h"
+#include "lib/bmp.h"
 #define LINE_WIDTH 3
 
 i32 main() {
@@ -12,9 +12,9 @@ i32 main() {
     printf("Please enter the puzzle: ");
     THROW_IF(scanf("%[^\n]%*c", config_path) != 1, "Invalid config path.");
 
-    BMP* bmp = read_bmp(image_path);
-    THROW_IF(bmp == NULL, "Failed to load the image file: \"%s\"\n", image_path);
-    THROW_IF(strncmp(bmp->header->magic, "BM", 2) != 0, "\"%s\" is not a valid BMP file. Magic: %s\n", image_path, bmp->header->magic);
+    BMP* source_img;
+    u8 error = read_bmp(image_path, &source_img);
+    THROW_IF(error, "Failed to load the image file: \"%s\"\n", BMP_ERROR_MESSAGE[error]);
 
     FILE* config = fopen(config_path, "r");
     THROW_IF(config == NULL, "Failed to open the config file: \"%s\"\n", config_path);
@@ -24,15 +24,16 @@ i32 main() {
     THROW_IF(m < 1 || n < 1 || k < 1, "Invalid Config. m, n, k must be positive.\n");
     DBG_PRINT("m: %" PRId64 ", n: %" PRId64 ", k: %" PRId64 "\n", m, n, k);
 
-    u64 each_width = (bmp->header->width - LINE_WIDTH * (m + 1)) / m;
-    u64 each_height = (bmp->header->height - LINE_WIDTH * (n + 1)) / n;
+    i32 raw_width = source_img->header->info_header.width, raw_height = source_img->header->info_header.height;
+    u64 each_width = (raw_width - LINE_WIDTH * (m + 1)) / m;
+    u64 each_height = (raw_height - LINE_WIDTH * (n + 1)) / n;
     BMP** pieces = calloc(m * n + 1, sizeof(BMP*));
-    pieces[0] = create_bmp(each_width, each_height);
+    pieces[0] = create_bmp(each_width, each_height, PIXEL_WHITE_TRANSPARENT);
     for (i64 i = 0; i < m * n; i++) {
-        pieces[i + 1] = create_bmp(each_width, each_height);
+        pieces[i + 1] = create_bmp(each_width, each_height, PIXEL_YELLOW);
         u64 offset_y = (i / m) * each_height + LINE_WIDTH * ((i / m) + 1);
         u64 offset_x = (i % m) * each_width + LINE_WIDTH * ((i % m) + 1);
-        bmp_copy(pieces[i + 1], 0, 0, each_width, each_height, bmp, offset_x, offset_y);
+        bmp_copy(pieces[i + 1], 0, 0, each_width, each_height, source_img, offset_x, offset_y);
     }
 
     i64* state = calloc(m * n, sizeof(i64));
@@ -65,8 +66,7 @@ i32 main() {
         }
         empty = new_empty;
 
-        BMP* new_bmp = create_bmp(bmp->header->width / 3 * 3, bmp->header->height / 3 * 3);
-        bmp_fill(new_bmp, 0, 0, bmp->header->width / 3 * 3, bmp->header->height / 3 * 3, (Pixel) { 0, 0, 0 });
+        BMP* step_img = create_bmp(raw_width / 3 * 3, raw_height / 3 * 3, PIXEL_BLACK);
         for (u64 row = 0; row < n; row++) {
             for (u64 col = 0; col < m; col++) {
                 u64 piece_id = state[row * m + col];
@@ -74,7 +74,7 @@ i32 main() {
                 u64 offset_y = row * each_height + LINE_WIDTH * (row + 1);
                 u64 offset_x = col * each_width + LINE_WIDTH * (col + 1);
                 bmp_copy(
-                    new_bmp, offset_x, offset_y, offset_x + pieces[piece_id]->header->width, offset_y + pieces[piece_id]->header->height,
+                    step_img, offset_x, offset_y, offset_x + each_width, offset_y + each_height,
                     pieces[piece_id], 0, 0
                 );
             }
@@ -82,17 +82,17 @@ i32 main() {
 
         string path = calloc(1024, sizeof(char));
         sprintf(path, "%" PRIu64 ".bmp", i);
-        write_bmp(new_bmp, path, 24);
+        THROW_IF(step_img->save(step_img, path, 8, 8, 8, 0), "Failed to write the image file: \"%s\"\n", path);
         free(path);
-        free(new_bmp);
+        step_img->free(step_img);
     }
 
     free(state);
     for (u64 i = 0; i <= m * n; i++) {
-        free(pieces[i]);
+        pieces[i]->free(pieces[i]);
     }
     free(pieces);
-    free(bmp);
+    source_img->free(source_img);
 
     printf("Done.\n");
 
