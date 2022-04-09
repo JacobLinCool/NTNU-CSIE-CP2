@@ -1,6 +1,8 @@
 #ifndef MID_UTILS_H
 #define MID_UTILS_H
 
+#include <ctype.h>
+
 #include "lib/base.h"
 #include "lib/string.h"
 #include "lib/timing.h"
