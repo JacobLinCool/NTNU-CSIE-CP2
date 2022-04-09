@@ -5,7 +5,7 @@ const { get_config } = require("./config");
 const { dirs } = require("./utils");
 const { md_to_pdf } = require("./pdf");
 
-const HANDWRITING_SRC_MATCH = /^hw\d{4}.md$/;
+const HANDWRITING_SRC_MATCH = /^(hw|mid|fin)\d{2,4}.md$/;
 
 (async () => {
     const targets = dirs();

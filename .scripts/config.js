@@ -15,7 +15,7 @@ function get_config(dir) {
         if (fs.existsSync(filepath)) {
             configs.set(filepath, yaml.load(fs.readFileSync(filepath, "utf8")));
         } else {
-            configs.set(filepath, {});
+            configs.set(filepath, { autobuild: {} });
         }
     }
     return configs.get(filepath);

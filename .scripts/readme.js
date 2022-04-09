@@ -71,7 +71,7 @@ ${handwritings.map((f) => `- **${path.basename(f)}**`).join("\n")}
             fs.writeFileSync(path.resolve(dir, "README.md"), README);
             spinner.text = `[Readme] ${path.basename(dir)} README.md Generated`;
         } else {
-            spinner.text = `[Readme] ${path.basename(dir)} README.md Generated Skipped`;
+            spinner.warn(`[Readme] ${path.basename(dir)} README.md Generation Skipped`);
         }
         if (fs.existsSync(path.resolve(dir, "README.md"))) {
             spinner.text = `[Readme] ${path.basename(dir)} Converting README.md to PDF`;

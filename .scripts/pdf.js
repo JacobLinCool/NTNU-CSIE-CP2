@@ -1,3 +1,4 @@
+const fs = require("node:fs");
 const { mdToPdf } = require("md-to-pdf");
 
 /**
@@ -6,6 +7,9 @@ const { mdToPdf } = require("md-to-pdf");
  * @returns {Promise<Buffer>}
  */
 async function md_to_pdf(markdown_path) {
+    if (!fs.existsSync(markdown_path)) {
+        return;
+    }
     const pdf = await mdToPdf(
         { path: markdown_path },
         {

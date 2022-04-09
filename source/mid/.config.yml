@@ -1,0 +1,4 @@
+autobuild:
+    makefile: false
+    handwriting: true
+    readme: false
