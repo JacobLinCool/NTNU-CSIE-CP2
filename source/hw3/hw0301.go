@@ -55,3 +55,10 @@ type Item struct {
 	BookID        string `json:"book_id"`
 	BookName      string `json:"book_name"`
 }
+
+// Here is the explanation for the code above:
+// 1. We read the bible.txt file, and split it by newline
+// 2. We loop over the lines, and unmarshal each line into a Item struct
+// 3. We then check if the target string is included in the item's text
+// 4. If yes, we append the item to the result slice
+// 5. We print the result slice
