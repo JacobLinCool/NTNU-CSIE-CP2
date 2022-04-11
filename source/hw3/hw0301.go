@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -28,7 +30,9 @@ func main() {
 
 	var target string
 	fmt.Print("Please enter the search target: ")
-	fmt.Scanln(&target)
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	target = scanner.Text()
 
 	result := make([]Item, 0, len(bible))
 	for _, item := range bible {
