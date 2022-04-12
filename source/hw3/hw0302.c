@@ -73,18 +73,9 @@ Subtitle* parse(string* raw) {
 }
 
 Subtitles* open_srt(string filepath) {
-    i32 fd = open(filepath, O_RDONLY);
-    i64 size = lseek(fd, 0, SEEK_END);
-    DBG_PRINT("file size = %" PRId64 "\n", size);
-
-    THROW_IF(size < 0, "No File");
-
-    string file = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+    string file = File.read(filepath);
+    THROW_IF(file == NULL, "No File");
     string head = file;
-
-    if (((u8*)head)[0] == 0xEF && ((u8*)head)[1] == 0xBB && ((u8*)head)[2] == 0xBF) {
-        head += 3;
-    }
 
     Subtitles* subtitles = create_Subtitles();
     while (1) {
@@ -94,7 +85,6 @@ Subtitles* open_srt(string filepath) {
         }
         subtitles->push(subtitles, subtitle);
     }
-    munmap(file, size);
 
     return subtitles;
 }

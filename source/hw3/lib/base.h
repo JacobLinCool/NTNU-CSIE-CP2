@@ -13,6 +13,7 @@
 
  // #region Include Common Header Files. Remember to use -lm flag when compiling.
 #include <assert.h>
+#include <ctype.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <math.h>

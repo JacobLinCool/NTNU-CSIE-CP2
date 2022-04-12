@@ -10,12 +10,12 @@ import (
 )
 
 func main() {
-	bibleBytes, err := ioutil.ReadFile("bible.txt")
+	bible_bytes, err := ioutil.ReadFile("bible.txt")
 	if err != nil {
 		panic(err)
 	}
 
-	bible_raw := strings.Split(string(bibleBytes), "\n")
+	bible_raw := strings.Split(string(bible_bytes), "\n")
 	bible := make([]Item, 0, len(bible_raw))
 	for _, line := range bible_raw {
 		if len(line) == 0 {

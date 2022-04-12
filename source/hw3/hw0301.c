@@ -54,31 +54,14 @@ Sentence* parse(string* raw) {
     return sentence;
 }
 
-string lower_str(string str) {
-    string lower = calloc(strlen(str), sizeof(char));
-
-    for (u64 i = 0; str[i] != '\0'; i++) {
-        lower[i] = tolower(str[i]);
-    }
-
-    return lower;
-}
-
 i32 main() {
     system("clear");
     printf("Parsing bible.txt ... It may take a few seconds.\n");
-    i32 fd = open("bible.txt", O_RDONLY);
-    i64 size = lseek(fd, 0, SEEK_END);
-    DBG_PRINT("file size = %" PRId64 "\n", size);
 
-    THROW_IF(size == -1, "No File");
-
-    string file = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+    string file = File.read("bible.txt");
+    THROW_IF(file == NULL, "No File");
     string head = file;
-
-    if (((u8*)head)[0] == 0xEF && ((u8*)head)[1] == 0xBB && ((u8*)head)[2] == 0xBF) {
-        head += 3;
-    }
+    u64 size = strlen(file);
 
     timing_start("Parse bible.txt");
     Sentences* sentences = create_Sentences();
@@ -96,19 +79,18 @@ i32 main() {
         }
     }
     f128 elapsed = timing_check("Parse bible.txt");
-    munmap(file, size);
     system("clear");
     DBG_PRINT("Parsed %zu sentences in %Lf ms.\n", sentences->size, elapsed);
 
     string target = calloc(size, sizeof(char));
     printf("Please enter the search target: ");
     scanf("%[^\n]%*c", target);
-    target = lower_str(target);
+    target = String.lower(target);
 
     Sentences* found = create_Sentences();
     for (u64 i = 0; i < sentences->size; i++) {
         Sentence* sentence = sentences->get(sentences, i);
-        string lower = lower_str(sentence->text);
+        string lower = String.lower(sentence->text);
         if (strstr(lower, target) != NULL) {
             found->push(found, sentence);
         }

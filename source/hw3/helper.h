@@ -17,5 +17,7 @@
 #include "lib/debug.h"
 #include "lib/array.h"
 #include "lib/format.h"
+#include "lib/file.h"
+#include "lib/string_utils.h"
 
 #endif // JACOB_HELPERS_H
