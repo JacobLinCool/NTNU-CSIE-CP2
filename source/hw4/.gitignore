@@ -1,0 +1,6 @@
+*.txt
+*.srt
+*.bmp
+PM2/
+test.c
+test.h
