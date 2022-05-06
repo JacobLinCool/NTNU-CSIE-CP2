@@ -3,6 +3,175 @@
 #include "lib/string.h"
 #define MAX_STRUCT_SIZE (2 * 1024 * 1024)
 
+// #region buffer_h
+string buffer_h = \
+"/**\n"
+" * @file buffer.h\n"
+" * @author JacobLinCool <hi@jacoblin.cool> (github.com/JacobLinCool)\n"
+" * @brief The buffer header file of Cimple Lib.\n"
+" * @version 3.0.0\n"
+" * @date 2022-05-03\n"
+" *\n"
+" * @copyright Copyright (c) 2022 JacobLinCool (MIT License)\n"
+" * @see https://github.com/JacobLinCool/Cimple-Lib\n"
+" */\n"
+"#ifndef __CIMPLE_UTILS_BUFFER_H\n"
+"#define __CIMPLE_UTILS_BUFFER_H\n"
+"\n"
+"#include <stdbool.h>\n"
+"#include <stdint.h>\n"
+"#include <stdio.h>\n"
+"#include <stdlib.h>\n"
+"\n"
+"bool __buffer_get_bit(const void* buffer, size_t bit) {\n"
+"    if (buffer == NULL) {\n"
+"        return false;\n"
+"    }\n"
+"\n"
+"    const uint8_t* buffer_ptr = buffer;\n"
+"    size_t         byte = bit / 8;\n"
+"    size_t         offset = 7 - bit % 8;\n"
+"    return (buffer_ptr[byte] >> offset) & 1;\n"
+"}\n"
+"\n"
+"void __buffer_set_bit(void* buffer, size_t bit, bool value) {\n"
+"    if (buffer == NULL) {\n"
+"        return;\n"
+"    }\n"
+"\n"
+"    uint8_t* buffer_ptr = buffer;\n"
+"    size_t   byte = bit / 8;\n"
+"    size_t   offset = 7 - bit % 8;\n"
+"    if (value) {\n"
+"        buffer_ptr[byte] |= 1 << offset;\n"
+"    } else {\n"
+"        buffer_ptr[byte] &= ~(1 << offset);\n"
+"    }\n"
+"}\n"
+"\n"
+"char* __buffer_stringify(const void* buffer, size_t size, size_t col_size, size_t row_size) {\n"
+"    if (buffer == NULL) {\n"
+"        return NULL;\n"
+"    }\n"
+"\n"
+"    size_t cols = (size + col_size - 1) / col_size;\n"
+"    size_t rows = (cols + row_size - 1) / row_size;\n"
+"    char*  str = malloc(size + cols + rows + 1);\n"
+"\n"
+"    size_t idx = 0;\n"
+"    for (size_t i = 0; i < size; i++) {\n"
+"        str[idx++] = __buffer_get_bit(buffer, i) ? '1' : '0';\n"
+"        if (i % col_size == col_size - 1) {\n"
+"            str[idx++] = ' ';\n"
+"        }\n"
+"        if (i % (col_size * row_size) == (col_size * row_size) - 1 && i != size - 1) {\n"
+"            str[idx++] = '\\n';\n"
+"        }\n"
+"    }\n"
+"    str[idx] = '\\0';\n"
+"\n"
+"    return str;\n"
+"}\n"
+"\n"
+"void __buffer_parse(void* buffer, const char* str, size_t size) {\n"
+"    if (buffer == NULL || str == NULL) {\n"
+"        return;\n"
+"    }\n"
+"\n"
+"    size_t idx = 0;\n"
+"    for (size_t i = 0; i < size; i++) {\n"
+"        if (str[idx] != '0' && str[idx] != '1') {\n"
+"            idx++, i--;\n"
+"            continue;\n"
+"        }\n"
+"        __buffer_set_bit(buffer, i, str[idx++] == '1');\n"
+"    }\n"
+"}\n"
+"\n"
+"bool __buffer_endian() { return (*(uint16_t*)\"\\x01\\x02\") == 0x0201; }\n"
+"\n"
+"void* __buffer_reverse(const void* buffer, size_t size) {\n"
+"    if (buffer == NULL) {\n"
+"        return NULL;\n"
+"    }\n"
+"\n"
+"    uint8_t* reversed = malloc(size);\n"
+"    for (size_t i = 0; i < size; i++) {\n"
+"        reversed[i] = ((uint8_t*)buffer)[size - i - 1];\n"
+"    }\n"
+"    return reversed;\n"
+"}\n"
+"\n"
+"void* __buffer_to_big(const void* buffer, size_t size) {\n"
+"    if (buffer == NULL) {\n"
+"        return NULL;\n"
+"    }\n"
+"\n"
+"    size_t   blocks = (size + 7) / 8;\n"
+"    size_t   padding = blocks * 8 - size;\n"
+"    uint8_t* big = calloc(blocks, 1);\n"
+"    for (size_t b = 0; b < blocks; b++) {\n"
+"        size_t len = b == blocks - 1 ? 8 - padding : 8;\n"
+"        for (size_t i = 0; i < len; i++) {\n"
+"            size_t pos = size - 1 - b * 8 - (7 - i) + (b == blocks - 1 ? padding : 0);\n"
+"            if (pos < size && pos >= 0) {\n"
+"                __buffer_set_bit(big, pos, __buffer_get_bit(buffer, b * 8 + i));\n"
+"            }\n"
+"        }\n"
+"    }\n"
+"\n"
+"    return big;\n"
+"}\n"
+"\n"
+"void* __buffer_to_little(const void* buffer, size_t size) {\n"
+"    if (buffer == NULL) {\n"
+"        return NULL;\n"
+"    }\n"
+"\n"
+"    size_t   blocks = (size + 7) / 8;\n"
+"    size_t   padding = blocks * 8 - size;\n"
+"    uint8_t* little = calloc(blocks, 1);\n"
+"    for (size_t b = 0; b < blocks; b++) {\n"
+"        size_t len = b == blocks - 1 ? 8 - padding : 8;\n"
+"        for (size_t i = 0; i < len; i++) {\n"
+"            size_t pos = b * 8 + i;\n"
+"            if (pos < size && pos >= 0) {\n"
+"                __buffer_set_bit(little, pos,\n"
+"                                 __buffer_get_bit(buffer, size - 1 - b * 8 - (7 - i) +\n"
+"                                                              (b == blocks - 1 ? padding : 0)));\n"
+"            }\n"
+"        }\n"
+"    }\n"
+"\n"
+"    return little;\n"
+"}\n"
+"\n"
+"/**\n"
+" * @brief Buffer utility functions.\n"
+" */\n"
+"struct {\n"
+"    bool (*get_bit)(const void* buffer, size_t bit);\n"
+"    void (*set_bit)(void* buffer, size_t bit, bool value);\n"
+"    char* (*stringify)(const void* buffer, size_t size, size_t col_size, size_t row_size);\n"
+"    void (*parse)(void* buffer, const char* str, size_t size);\n"
+"    bool (*endian)();\n"
+"    void* (*reverse)(const void* buffer, size_t size);\n"
+"    void* (*to_big)(const void* buffer, size_t size);\n"
+"    void* (*to_little)(const void* buffer, size_t size);\n"
+"} Buffer = {\n"
+"    .get_bit = __buffer_get_bit,\n"
+"    .set_bit = __buffer_set_bit,\n"
+"    .stringify = __buffer_stringify,\n"
+"    .parse = __buffer_parse,\n"
+"    .endian = __buffer_endian,\n"
+"    .reverse = __buffer_reverse,\n"
+"    .to_big = __buffer_to_big,\n"
+"    .to_little = __buffer_to_little,\n"
+"};\n"
+"\n"
+"#endif  // __CIMPLE_UTILS_BUFFER_H\n";
+// #endregion
+
 string template_h = \
 "#pragma once\n\n" \
 "#include <stdint.h>\n\n" \
@@ -30,12 +199,11 @@ string template_encode_body = \
 "        return -1;\n" \
 "    }\n" \
 "\n" \
-"    uint8_t* buffer_ptr = buffer;\n" \
 "    size_t from_bit = 0;\n" \
 "    size_t data_offset = 0;\n" \
 "    for (size_t i = 0; i < field_count; i++) {\n" \
 "        size_t size = field_sizes[i];\n" \
-"        put_buffer(buffer_ptr, from_bit, size, (uint8_t*)data + data_offset);\n" \
+"        put_buffer(buffer, from_bit, size, (uint8_t*)data + data_offset);\n" \
 "        from_bit += size;\n" \
 "        data_offset += (size + 7) / 8;\n" \
 "    }\n" \
@@ -49,12 +217,11 @@ string template_decode_body = \
 "        return -1;\n" \
 "    }\n" \
 "\n" \
-"    const uint8_t* buffer_ptr = buffer;\n" \
 "    size_t from_bit = 0;\n" \
 "    size_t data_offset = 0;\n" \
 "    for (size_t i = 0; i < field_count; i++) {\n" \
 "        size_t size = field_sizes[i];\n" \
-"        uint8_t* bin = take_buffer(buffer_ptr, from_bit, size);\n" \
+"        uint8_t* bin = take_buffer(buffer, from_bit, size);\n" \
 "        memcpy((uint8_t*)data + data_offset, bin, (size + 7) / 8);\n" \
 "        free(bin);\n" \
 "        from_bit += size;\n" \
@@ -66,7 +233,8 @@ string template_decode_body = \
 
 string template_c = \
 "#include \"%s.h\"\n\n" \
-"#include <stdint.h>\n#include <stdlib.h>\n#include <string.h>\n\n" \
+"#include <stdint.h>\n#include <stdbool.h>\n#include <stdlib.h>\n#include <string.h>\n\n" \
+"%s\n" \
 "%s\n" \
 "%s\n" \
 "%s\n" \
@@ -76,33 +244,35 @@ string template_c = \
 
 string helper_functions = \
 "static uint8_t* take_buffer(const uint8_t* buffer, size_t from_bit, size_t size) {\n" \
-"    size_t offset = from_bit % 8;\n" \
-"    size_t block_count = (size + offset + 7) / 8;\n" \
-"    uint8_t* data = calloc(block_count, sizeof(uint8_t));\n" \
-"    memcpy(data, buffer + from_bit / 8, block_count);\n" \
-"\n" \
-"    if (offset != 0) {\n" \
-"        data[0] <<= offset;\n" \
-"        for (size_t i = 1; i < block_count; i++) {\n" \
-"            data[i - 1] |= data[i] >> (8 - offset);\n" \
-"            data[i] <<= offset;\n" \
-"        }\n" \
+"    size_t pad = (size < 8) ? 8 - size : 0;\n" \
+"    void* data = calloc((size + 7) / 8, 1);\n" \
+"    for (size_t i = 0; i < size; i++) {\n" \
+"        Buffer.set_bit(data, pad + i, Buffer.get_bit(buffer, from_bit + i));\n" \
 "    }\n" \
-"\n" \
-"    size_t last_block_size = size % 8;\n" \
-"    if (last_block_size != 0) {\n" \
-"        data[block_count - 1] &= ((1 << last_block_size) - 1) << (8 - last_block_size);\n" \
+"    if (size > 8) {\n" \
+"        void* little = Buffer.to_little(data, size);\n" \
+"        free(data);\n" \
+"        return little;\n" \
 "    }\n" \
-"    return data;\n" \
+"    else {\n" \
+"        return data;\n" \
+"    }\n" \
 "}\n" \
 "\n" \
 "static void put_buffer(uint8_t* buffer, size_t from_bit, size_t size, const uint8_t* data) {\n" \
-"    size_t block_count = (size + 7) / 8;\n" \
-"    size_t offset = from_bit % 8;\n" \
-"    size_t start_byte = from_bit / 8;\n" \
-"    for (size_t i = 0; i < block_count; i++) {\n" \
-"        buffer[start_byte + i] |= data[i] >> offset;\n" \
-"        buffer[start_byte + i + 1] |= data[i] << (8 - offset);\n" \
+"    if (size <= 8) {\n" \
+"        for (size_t i = 0; i < size; i++) {\n" \
+"            size_t pad = (size < 8) ? 8 - size : 0;\n" \
+"            Buffer.set_bit(buffer, from_bit + i, Buffer.get_bit(data, pad + i));\n" \
+"        }\n" \
+"    }\n" \
+"    else {\n" \
+"        void* big = Buffer.to_big(data, size);\n" \
+"        for (size_t i = 0; i < size; i++) {\n" \
+"            size_t pad = (size < 8) ? 8 - size : 0;\n" \
+"            Buffer.set_bit(buffer, from_bit + i, Buffer.get_bit(big, pad + i));\n" \
+"        }\n" \
+"        free(big);\n" \
 "    }\n" \
 "    return;\n" \
 "}\n";
@@ -333,7 +503,7 @@ i32 main(i32 argc, string argv[]) {
     Timing.start("write body");
     string body = format(
         template_c,
-        parsed[2], sizes, helper_functions,
+        parsed[2], buffer_h, sizes, helper_functions,
         init_func_body, free_func_body, encode_func_body, decode_func_body
     );
     File.write(format("%s.c", parsed[2]), body);

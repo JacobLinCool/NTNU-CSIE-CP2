@@ -98,7 +98,9 @@ void set_notes() {
     notes[0xB0] = strdup("金錢");
     notes[0xF0] = strdup("人際關係");
     notes[0x10C] = strdup("飲食計畫");
+    notes[0x138] = strdup("父女對話次數");
     notes[0x13A] = strdup("父女聊天次數");
+    notes[0x13E] = strdup("父女說教次數");
     notes[0x1C8] = strdup("冒險次數");
     notes[0x1CA] = strdup("東部冒險次數");
     notes[0x1CC] = strdup("西部冒險次數");
@@ -175,13 +177,13 @@ i32 main() {
                 u8* prev_ptr = prev + offset;
                 Console.yellow(
                     "%6X [%c] %4" PRId8 " %4" PRIu8 " %6" PRId16 " %6" PRIu16 " %12" PRId32 " %12" PRIu32 " %s",
-                    offset, *ptr >= 32 ? *(char*)ptr : ' ', *ptr, *ptr, *(i16*)ptr, *(u16*)ptr, *(i32*)ptr, *(u32*)ptr,
+                    offset, (*ptr >= 32 && *ptr <= 127) ? *(char*)ptr : ' ', *ptr, *ptr, *(i16*)ptr, *(u16*)ptr, *(i32*)ptr, *(u32*)ptr,
                     notes[offset] != NULL ? notes[offset] : ""
                 );
                 if (prev != NULL) {
                     Console.blue(
                         "       [%c] %4" PRId8 " %4" PRIu8 " %6" PRId16 " %6" PRIu16 " %12" PRId32 " %12" PRIu32,
-                        *prev_ptr >= 32 ? *(char*)prev_ptr : ' ', *prev_ptr, *prev_ptr, *(i16*)prev_ptr, *(u16*)prev_ptr, *(i32*)prev_ptr, *(u32*)prev_ptr
+                        (*prev_ptr >= 32 && *prev_ptr <= 127) ? *(char*)prev_ptr : ' ', *prev_ptr, *prev_ptr, *(i16*)prev_ptr, *(u16*)prev_ptr, *(i32*)prev_ptr, *(u32*)prev_ptr
                     );
                 }
                 last = offset;
