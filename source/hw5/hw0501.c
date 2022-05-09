@@ -28,19 +28,31 @@ i32 main(i32 argc, string argv[]) {
         return EXIT_SUCCESS;
     }
 
-    size_t divider = 1000;
-    string unit = "KB";
+    i64 divider = -1;
+    string unit;
     if (Options.has(options, "bytes") || Options.has(options, "b")) {
         divider = 1;
         unit = "B";
     }
-    else if (Options.has(options, "kilo")) {
+    if (Options.has(options, "kilo")) {
+        if (divider != -1) {
+            Console.error("You can only specify one unit.");
+            return EXIT_FAILURE;
+        }
         divider = 1000;
         unit = "KB";
     }
-    else if (Options.has(options, "mega")) {
+    if (Options.has(options, "mega")) {
+        if (divider != -1) {
+            Console.error("You can only specify one unit.");
+            return EXIT_FAILURE;
+        }
         divider = 1000000;
         unit = "MB";
+    }
+    if (divider == -1) {
+        divider = 1000;
+        unit = "KB";
     }
 
     i64 interval = 1000; // milliseconds
@@ -81,7 +93,7 @@ i32 main(i32 argc, string argv[]) {
 
     for (i64 i = 0; i < repeat; i++) {
         size_t size = 0;
-        string* meminfo = $(String.split($(run("grep -m 3 -o \"[0-9]*\" /proc/meminfo")), "\n", &size));
+        string* meminfo = $(String.split($(run("grep -m 3 -o \"[0-9]*\" /proc/meminfo", NULL)), "\n", &size));
         for (size_t j = 0; j < size; j++) { $(meminfo[j]); }
         total = strtol(meminfo[0], NULL, 10) * 1024 / divider;
         available = strtol(meminfo[2], NULL, 10) * 1024 / divider;
