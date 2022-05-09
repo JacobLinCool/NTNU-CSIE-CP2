@@ -1,6 +1,8 @@
 #ifndef __FILE_H
 #define __FILE_H
 
+#include "cimple/all.h"
+
 typedef char* string;
 
 typedef struct FileInfo {

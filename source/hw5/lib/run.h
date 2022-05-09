@@ -1,6 +1,8 @@
 #ifndef __RUN_H
 #define __RUN_H
 
+#include "cimple/all.h"
+
 typedef char* string;
 
 uint8_t* run(string command, size_t* buffer_size) {
