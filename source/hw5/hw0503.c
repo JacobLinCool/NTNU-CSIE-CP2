@@ -77,8 +77,9 @@ uint8_t* base64_decode(char input[], size_t input_size, size_t* output_size) {
     size_t size = input_size / 4 * 3;
     uint8_t* output = calloc(size + 1, sizeof(uint8_t));
 
+    uint32_t padding = 0;
     for (size_t idx_in = 0, idx_out = 0; idx_in < input_size; idx_in += 4, idx_out += 3) {
-        uint32_t block = 0, padding = 0;
+        uint32_t block = 0;
         for (size_t i = 0; i < 4; i++) {
             block <<= 6;
             if (input[idx_in + i] != '=') {
@@ -93,7 +94,7 @@ uint8_t* base64_decode(char input[], size_t input_size, size_t* output_size) {
         }
     }
 
-    *output_size = size;
+    *output_size = size - padding;
     return output;
 }
 
