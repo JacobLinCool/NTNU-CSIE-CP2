@@ -9,8 +9,8 @@ My homework solutions, not perfect but work (mostly).
 - [Homework 1](./source/hw1/) | [Problems][problems-hw1]
 - [Homework 2](./source/hw2/) | [Problems][problems-hw2]
 - [Homework 3](./source/hw3/) | [Problems][problems-hw3]
-- Homework 4 | Problems
-- Homework 5 | Problems
+- [Homework 4](./source/hw4/) | [Problems][problems-hw4]
+- [Homework 5](./source/hw5/) | [Problems][problems-hw5]
 
 ## Links
 
@@ -22,6 +22,6 @@ My homework solutions, not perfect but work (mostly).
 [problems-hw1]: https://drive.google.com/file/d/1u8ljIu-4xUGDnuYYFHJXEU66Qy8w6jrT/view
 [problems-hw2]: https://drive.google.com/file/d/1PqoiU1tPi4x0MWsLUJcdipgtnTCDaBQt/view
 [problems-hw3]: https://drive.google.com/file/d/101jlsj92Ldy5y5PIS8LFNNMqV8c-C6UU/view
-[problems-hw4]: ./
-[problems-hw5]: ./
+[problems-hw4]: https://drive.google.com/file/d/1y3zC9DaFrCzKf9QMMyYKl8ZHONqZoLKm/view
+[problems-hw5]: https://drive.google.com/file/d/1ro5HMjkgxd6ZbZHLQ3qvgywmcpnuxlZ7/view
 [course-link]: https://sites.google.com/gapps.ntnu.edu.tw/neokent/teaching/2022spring-computer-programming-ii
