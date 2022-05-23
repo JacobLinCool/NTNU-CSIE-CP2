@@ -46,6 +46,7 @@ void help() {
         }
     }
     printf("\n");
+    Console.blue("Contact: JacobLinCool <hi@jacoblin.cool> (https://github.com/JacobLinCool)");
 }
 
 i32 main(i32 argc, string argv[]) {
@@ -85,7 +86,12 @@ i32 main(i32 argc, string argv[]) {
             tags[i] = (ID3*)(files[i]->data + (files[i]->size - sizeof(ID3)));
             memset(tags[i], 0, sizeof(ID3));
             strncpy(tags[i]->header, "TAG", 3);
+            uint8_t tmp = 255;
+            memcpy(tags[i]->genre, &tmp, 1);
             Console.yellow("ID3 tag will be added to \"%s\"", options->wilds[i]);
+            if (Options.has(options, "d")) {
+                Console.gray("Although it will be deleted immediately...");
+            }
         }
     }
 
@@ -109,7 +115,10 @@ i32 main(i32 argc, string argv[]) {
             return EXIT_FAILURE;
         }
         for (i32 i = 0; i < options->wild_count; i++) {
-            memset(tags[i]->zero, 0, 1);
+            if (tags[i]->zero[0] != '\0') {
+                Console.error("Cannot modify track tag when comment tag is over 28 characters!");
+                return EXIT_FAILURE;
+            }
             memset(tags[i]->track, 0, 1);
             memcpy(tags[i]->track, &track_num, 1);
         }
@@ -151,13 +160,15 @@ i32 main(i32 argc, string argv[]) {
     }
     if (Options.get(options, "c") != NULL) {
         string comment = Options.get(options, "c");
-        if (comment == NULL || strlen(comment) > 28) {
-            Console.error("Invalid comment! It should be less than 28 characters!");
-            return EXIT_FAILURE;
-        }
+        size_t len = strlen(comment);
         for (i32 i = 0; i < options->wild_count; i++) {
-            memset(tags[i]->comment, 0, 28);
-            memcpy(tags[i]->comment, comment, strlen(comment));
+            size_t max_len = (tags[i]->zero[0] == '\0' && tags[i]->track[0] != '\0') ? 28 : 30;
+            if (comment == NULL || strlen(comment) > max_len) {
+                Console.error("Invalid comment! It should be less than %zu characters!", max_len);
+                return EXIT_FAILURE;
+            }
+            memset(tags[i]->comment, 0, max_len);
+            memcpy(tags[i]->comment, comment, len);
         }
     }
     if (Options.get(options, "g") != NULL) {
@@ -170,6 +181,9 @@ i32 main(i32 argc, string argv[]) {
                     break;
                 }
             }
+            if (strcmp(genre, "Unknown") == 0) {
+                genre_num = 255;
+            }
         }
         if (genre == NULL || genre_num == -1) {
             Console.error("Invalid genre! Use \"-h\" to see the list of genres!");
@@ -181,8 +195,9 @@ i32 main(i32 argc, string argv[]) {
     }
     if (Options.has(options, "d")) {
         for (i32 i = 0; i < options->wild_count; i++) {
-            memset(tags[i], 0, sizeof(ID3));
-            strncpy(tags[i]->header, "TAG", 3);
+            files[i]->size -= sizeof(ID3);
+            files[i]->data = realloc(files[i]->data, files[i]->size);
+            Console.yellow("ID3 tag will be deleted from \"%s\". I hope you know what you're doing.", options->wilds[i]);
         }
     }
     if (Options.has(options, "l")) {
@@ -192,9 +207,14 @@ i32 main(i32 argc, string argv[]) {
             Console.cyan("\tArtist: \t%s", $(strndup(tags[i]->artist, sizeof(tags[i]->artist))));
             Console.cyan("\tAlbum:  \t%s", $(strndup(tags[i]->album, sizeof(tags[i]->album))));
             Console.cyan("\tYear:   \t%s", $(strndup(tags[i]->year, sizeof(tags[i]->year))));
-            Console.cyan("\tGenre:  \t%s (%" PRIu8 ")", *(u8*)tags[i]->genre >= 80 ? "" : Genres[*(u8*)tags[i]->genre], *(u8*)tags[i]->genre);
-            Console.cyan("\tComment:\t%s", $(strndup(tags[i]->comment, sizeof(tags[i]->comment))));
-            Console.cyan("\tTrack:  \t%" PRIu8, *(u8*)tags[i]->track);
+            Console.cyan("\tGenre:  \t%s (%" PRIu8 ")", *(u8*)tags[i]->genre >= 80 ? "Unknown" : Genres[*(u8*)tags[i]->genre], *(u8*)tags[i]->genre);
+            Console.cyan("\tComment:\t%s", $(strndup(tags[i]->comment, tags[i]->zero[0] == '\0' ? 28 : 30)));
+            if (tags[i]->zero[0] == '\0') {
+                Console.cyan("\tTrack:  \t%" PRIu8, *(u8*)tags[i]->track);
+            }
+            else {
+                Console.cyan("\tTrack:  \tUnavailable");
+            }
         }
         $free();
     }

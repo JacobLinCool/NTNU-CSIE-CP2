@@ -19,6 +19,7 @@ void help() {
     Console.magenta("Example:");
     Console.magenta("\t./hw0503 -e maldives.bmp -o maldives.txt");
     Console.magenta("\t./hw0503 -d maldives.txt -o maldives.bmp");
+    Console.blue("Contact: JacobLinCool <hi@jacoblin.cool> (https://github.com/JacobLinCool)");
 }
 
 char* base64_encode(uint8_t input[], size_t input_size, size_t* output_size) {

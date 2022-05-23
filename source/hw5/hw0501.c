@@ -13,6 +13,7 @@ void help() {
     Console.cyan("\t-s N,\t--seconds N\tRepeat printing every N seconds");
     Console.cyan("\t-c N,\t--count N\tRepeat printing N times , then exit");
     Console.cyan("\t-h,\t--help\t\tDisplay this help and exit");
+    Console.blue("Contact: JacobLinCool <hi@jacoblin.cool> (https://github.com/JacobLinCool)");
 }
 
 i32 main(i32 argc, string argv[]) {
