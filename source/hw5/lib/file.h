@@ -17,7 +17,7 @@ FileInfo* read_file(string path) {
 
     FILE* file = fopen(path, "rb");
     if (file == NULL) {
-        free(info), fclose(file);
+        free(info);
         return NULL;
     }
     fseek(file, 0, SEEK_END);
