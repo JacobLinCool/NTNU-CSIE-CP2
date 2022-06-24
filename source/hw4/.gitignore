@@ -4,3 +4,4 @@
 PM2/
 test.c
 test.h
+!Makefile
